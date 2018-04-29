@@ -15,22 +15,17 @@ import java.sql.SQLException;
  */
 public class DBConnection {
     
-    private static String url;
-    private static String username;
-    private static String password;
+    private static final String url="jdbc:sqlserver://localhost:1433;databaseName=auction";
+    private static final String username= "gaurab";
+    private static final String password= "gaurab";
     
-    public DBConnection() {
-        url = "jdbc:sqlserver://localhost:1433;databaseName=auction";
-        username = "root";
-        password = "";
-    }
     
     public static Connection getConnection() {
         Connection connection = null;
         
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            connection = DriverManager.getConnection(url, url, password);
+            connection = DriverManager.getConnection(url, username, password);
             
         } catch(ClassNotFoundException | SQLException ex) {
             System.out.println(ex.getMessage());
