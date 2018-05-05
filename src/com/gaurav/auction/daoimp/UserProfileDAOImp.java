@@ -5,94 +5,68 @@
  */
 package com.gaurav.auction.daoimp;
 
-import com.gaurav.auction.dao.GenericDAO;
-import com.gaurav.auction.database.DBConnection;
+import com.gaurav.auction.dao.UserProfileDAO;
 import com.gaurav.auction.entity.UserProfile;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 
 /**
  *
  * @author Nishan Dhungana
  */
-public class UserProfileDAOImp implements GenericDAO<UserProfile>{
+public class UserProfileDAOImp extends GenericDAOImp<UserProfile> implements UserProfileDAO{
 
-    private PreparedStatement pst;
-    private ResultSet res;
-    
-    public UserProfileDAOImp() {
-        
-    }
-    
     @Override
-    public void insert(UserProfile t) throws SQLException {
-        final String sql = "INSERT INTO tbl_user_profile VALUES(?, ?, ?, ?);";
-        DBConnection.getConnection().setAutoCommit(false);
+    public boolean isLogin(String username, String password) {
+        session = sessionFactory.openSession();
+        trans = session.beginTransaction();
         
+        UserProfile user = null;
+        final String SQL = "SELECT u FROM UserProfile u WHERE username=:username AND password=:pass";
+            
         try {
-            pst = DBConnection.getConnection().prepareStatement(sql);
-            pst.setString(1, t.getFullName());
-            pst.setString(2, t.getContact());
-            pst.setString(3, t.getUsername());
-            pst.setString(4, t.getUsername());
+            Query query = session.createQuery(SQL);
+            query.setParameter("username", username);
+            query.setParameter("pass", password);
             
-            pst.executeUpdate();
-            DBConnection.getConnection().commit();
+            trans.commit();
+            user = (UserProfile) query.uniqueResult();
             
-        } catch(SQLException ex) {
-            DBConnection.getConnection().rollback();
-            throw new SQLException(ex);
-        } finally {
-            DBConnection.getConnection().close();
-        }
-    }
-
-    @Override
-    public void update(UserProfile t) throws SQLException {
-        
-    }
-
-    @Override
-    public boolean delete(int id) throws SQLException {
-        return false;
-    }
-
-    @Override
-    public List<UserProfile> getAll() throws SQLException {
-        return null;
-    }
-
-    @Override
-    public UserProfile getById(int id) throws SQLException {
-        return null;
-    }
-    
-    public boolean isLogin(String username, String password) throws SQLException {
-        final String query = "SELECT * FROM tbl_user_profile WHERE username = ? AND password = ?";
-        DBConnection.getConnection().setAutoCommit(false);
-        
-        try {
-            pst = DBConnection.getConnection().prepareStatement(query);
-            pst.setString(1, username);
-            pst.setString(2, password);
-            
-            res = pst.executeQuery();
-            
-            while(res.next()) {
+            if (user != null) {
                 return true;
             }
             
-            DBConnection.getConnection().commit();
-            
-        } catch(SQLException ex) {
-            DBConnection.getConnection().rollback();
-            throw new SQLException(ex);
+        } catch(HibernateException ex) {
+            trans.rollback();
+            throw ex;
         } finally {
-            DBConnection.getConnection().close();
+            session.close();
         }
         
         return false;
     }
+
+    @Override
+    public int getUserId(String username, String password) throws Exception {
+        session = sessionFactory.openSession();
+        trans = session.beginTransaction();
+        
+        final String SQL = "SELECT u.id FROM UserProfile u WHERE username=:username AND password=:pass";
+        
+        try {
+            Query query = session.createQuery(SQL);
+            query.setParameter("username", username);
+            query.setParameter("pass", password);
+            
+            return (int) query.uniqueResult();
+            
+        } catch(HibernateException ex) {
+            trans.rollback();
+            throw ex;
+        } finally {
+            session.close();
+        }
+    }
+    
 }
+

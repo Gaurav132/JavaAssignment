@@ -34,7 +34,7 @@ public class CLayout {
     }
     
     public static void goToDashboard() {
-        Home.jPanel1.removeAll();
         cardLayout.show(Home.jPanel1, "dashboard");
     }
+    
 }

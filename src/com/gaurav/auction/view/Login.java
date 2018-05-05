@@ -4,11 +4,10 @@
  */
 package com.gaurav.auction.view;
 
+import com.gaurav.auction.dao.UserProfileDAO;
 import com.gaurav.auction.daoimp.UserProfileDAOImp;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,6 +18,9 @@ public class Login extends javax.swing.JPanel {
     /**
      * Creates new form Login
      */
+    
+    public static int userId = 0;
+    
     public Login() {
         initComponents();
         txtInfo.setVisible(false);
@@ -145,16 +147,17 @@ public class Login extends javax.swing.JPanel {
             txtInfo.setVisible(true);
         } else {
             try {
-                boolean res = new UserProfileDAOImp().isLogin(username, password);
-
+                UserProfileDAO g = new UserProfileDAOImp();
+                boolean res = g.isLogin(username, password);
+                userId = g.getUserId(username, password);
                 if (res) {
                     txtInfo.setVisible(false);
                     CLayout.goToDashboard();
                 } else {
                     txtInfo.setText("Invalid username or password");
                 }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+            } catch (Exception ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed

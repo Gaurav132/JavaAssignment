@@ -1,5 +1,5 @@
-create database auction;
-use auction;
+create database dba_auction;
+use dba_auction;
 
 CREATE TABLE tbl_user_profile(
 	id INT IDENTITY,
@@ -9,7 +9,6 @@ CREATE TABLE tbl_user_profile(
 	password VARCHAR(255) NOT NULL,
 	CONSTRAINT pk_user_id PRIMARY KEY(id)
 );
-
 
 SP_HELP tbl_user_profile;
 
